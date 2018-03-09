@@ -10,6 +10,8 @@
 
 此项目用于远程控制IO电平
 
+额外依赖组件：`http`、`sjson`
+
 ## 使用方法
 
 - 修改`init.lua`文件中的`ap`和`wifi connection`设置
