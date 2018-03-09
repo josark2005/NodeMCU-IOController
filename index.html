@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>IoT Conrtol Center</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      .text-center {
+        text-align: center;
+      }
+      .btn {
+        width: auto;
+        height: 30px;
+        border: 1px solid rgb(179, 179, 179);
+        margin-bottom: 15px;
+      }
+      .footer-text {
+        color: rgb(170, 170, 170);
+      }
+      .led {
+        width: 60px;
+        height: 30px;
+        border: 1px solid #e0e0e0;
+        margin-bottom: 5px;
+      }
+      .led:before {
+        content: "led ";
+      }
+      .led_off {
+        background-color: rgb(55, 55, 55);
+        color: #EEE
+      }
+      .led_on {
+        background-color: rgb(0, 175, 255);
+        color: rgb(55, 55, 55);
+      }
+    </style>
+    <script type="text/javascript" src="zepto.min.js"></script>
+    <script type="text/javascript">
+      $(function(){
+        led_status();
+        // ip
+        $.ajax({
+          url: "/api/getip",
+          dataType: "json",
+          timeout: 5000,
+          complete: function(XMLHttpRequst,status){
+            if (status == "timeout") {
+              alert("Link Timeout!");
+            }
+          },
+          success: function(data){
+            var staip = data.staip;
+            var apip = data.apip;
+            $("#staip").text(staip);
+            $("#apip").text(apip);
+          }
+        });
+      });
+
+      //-- function
+      function led(pin){
+        $.ajax({
+          url: "/led",
+          type: "get",
+          data: {"pin":pin},
+          dataType: "json",
+          timeout: 5000,
+          complete: function(XMLHttpRequst,status){
+            if (status == "timeout") {
+              alert("Link Timeout!");
+            }
+          },
+          success: function(data){
+            var status = data.status;
+            if (status == "ok"){
+              value = ($("#led_pin" + pin).hasClass("led_on")) ? "led_off" : "led_on";
+              $("#led_pin" + pin).removeClass("led_off led_on").addClass(value);
+            }
+          }
+        });
+      }
+      // led status
+      function led_status(){
+        $("#led_update").attr("disabled","disabled");
+        $("#led_update").text("更新中");
+        $.ajax({
+          url: "/api/getled",
+          dataType: "json",
+          timeout: 5000,
+          complete: function(XMLHttpRequst,status){
+            if (status == "timeout") {
+              alert("Link Timeout!");
+            }
+          },
+          success: function(data){
+            console.log(data);
+            $.each(data, function(key, value){
+              value = (value == 1) ? "led_on" : "led_off";
+              $("#led_" + key).removeClass("led_off led_on").addClass(value);
+            });
+          }
+        });
+        setTimeout(function(){
+          $("#led_update").removeAttr("disabled");
+          $("#led_update").text("更新状态");
+        },1000);
+      }
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>IoT Conrtol Center</h1>
+    </header>
+    <hr />
+    <div class="container">
+      <h2>基本状态</h2>
+      <div style="background-color:rgb(78, 78, 78);color:#FFF">
+        <p>
+          STAIP: <span id="staip">0.0.0.0</span><br />
+          AP IP : <span id="apip">0.0.0.0</span>
+        </p>
+      </div>
+      <hr />
+      <h2>GPIO控制 D0-D12</h2>
+      <button type="button" onclick="led_status();" id="led_update" class="btn">更新状态</button>
+      <br />
+      <button type="button" onclick="led(0);" id="led_pin0" class="led led_off">0</button>
+      <button type="button" onclick="led(1);" id="led_pin1" class="led led_off">1</button>
+      <button type="button" onclick="led(2);" id="led_pin2" class="led led_off">2</button>
+      <button type="button" onclick="led(3);" id="led_pin3" class="led led_off">*3</button>
+      <button type="button" onclick="led(4);" id="led_pin4" class="led led_off">4</button>
+      <button type="button" onclick="led(5);" id="led_pin5" class="led led_off">5</button>
+      <button type="button" onclick="led(6);" id="led_pin6" class="led led_off">6</button>
+      <button type="button" onclick="led(7);" id="led_pin7" class="led led_off">7</button>
+      <button type="button" onclick="led(8);" id="led_pin8" class="led led_off">8</button>
+      <button type="button" onclick="led(9);" id="led_pin9" class="led led_off">9</button>
+      <button type="button" onclick="led(10);" id="led_pin10" class="led led_off">10</button>
+      <button type="button" onclick="led(11);" id="led_pin11" class="led led_off">11</button>
+      <button type="button" onclick="led(12);" id="led_pin12" class="led led_off">12</button>
+    </div>
+    <hr />
+    <footer>
+      <p class="text-center footer-text">Designed by Jokin in Shanghai.</p>
+    </footer>
+  </body>
+</html>
